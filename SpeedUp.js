@@ -9,6 +9,7 @@ javascript: (() => {
     const videoDivs = [...document.querySelectorAll("video")];
     let removePlugin = [...document.querySelectorAll('.speed-up-container')].length > 0 || videoDivs.length == 0;
     window.VideoSpeedPlugin.active = !removePlugin;
+    window.VideoSpeedPlugin.last = Date.now();
 
     /* dh is divHandler that binds the relation to specific div within function */
     const dH = [];
@@ -97,20 +98,23 @@ javascript: (() => {
     };
 
     /* Set timeout to update remaining time */
-    const resetTime = () => {
-        if(!window.VideoSpeedPlugin.active) return;
+    const resetTime = (minUpdateTime = 0) => {
+        if(!window.VideoSpeedPlugin.active || 
+            (minUpdateTime && Math.round(Date.now() - window.VideoSpeedPlugin.last) < minUpdateTime)
+        ) return;
         setTime();
-        return setTimeout(() => {
+        window.VideoSpeedPlugin.last = Date.now();
+        /* return setTimeout(() => {
             clearTimeout(resetTime);
             if(videoDivs.some(videoDiv => !videoDiv.paused)) resetTime();
-        }, 1000)
+        }, 1000) */
     };
 
     /* Initiate timeout when plugin is loaded */
     resetTime();
 
     /* add eventlistener to videoDivs */
-    const ontimeupdate = resetTime;
+    const ontimeupdate = () => resetTime(500);
     videoDivs.forEach(videoDiv => videoDiv.addEventListener("timeupdate", ontimeupdate));
     
     /* add eventlistener to body */
