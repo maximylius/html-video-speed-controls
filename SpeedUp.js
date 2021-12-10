@@ -1,13 +1,14 @@
 javascript: (() => {
-
-    if(!window.VideoSpeedPlugin) window.VideoSpeedPlugin = {
-        t0: Date.now()
+    if(!window.sessionStorage.getItem("t0")) {
+        window.VideoSpeedPlugin = {t0: Date.now()};
+        window.sessionStorage.setItem("t0", Date.now());
+    } else {
+        window.VideoSpeedPlugin = {...window.VideoSpeedPlugin, t0: parseInt(window.sessionStorage.getItem("t0"))};
     };
-    window.VideoSpeedPlugin.active = true;
 
-    let speedUpContainers = [...document.querySelectorAll('.speed-up-container')];
     const videoDivs = [...document.querySelectorAll("video")];
-    const removePlugin = speedUpContainers.length > 0 || videoDivs.length == 0;
+    let removePlugin = [...document.querySelectorAll('.speed-up-container')].length > 0 || videoDivs.length == 0;
+    window.VideoSpeedPlugin.active = !removePlugin;
 
     /* dh is divHandler that binds the relation to specific div within function */
     const dH = [];
@@ -195,6 +196,8 @@ javascript: (() => {
         }
     .speed-up-btn:after {
         content: attr(data-string-tooltip);
+        top: calc(100% + 10px);
+        left: -50%;
         padding: 0.125rem 0.75rem 0.25rem 0.75rem;
         white-space: nowrap;
         border-radius: 0.5rem;
@@ -229,19 +232,14 @@ javascript: (() => {
         transition: opacity 0.2s 1.6s linear;
         top: calc(100% + 5px);
         left: 40%;
-        }
-    .speed-up-btn:after {
-        top: calc(100% + 10px);
-        left: -50%;
-        }
-        
+        }  
     `;
+
     style.appendChild(document.createTextNode(css));
     head.appendChild(style);
 
     /* Clean up HTML, eventlisteners and css */
     if(removePlugin){
-        window.VideoSpeedPlugin.active = false;
         document.body.removeEventListener("onkeyup", onkeyup);
         videoDivs.forEach(videoDiv => videoDiv.removeEventListener("timeupdate", ontimeupdate));
         clearTimeout(resetTime);
