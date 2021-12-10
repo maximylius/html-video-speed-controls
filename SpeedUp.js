@@ -1,6 +1,7 @@
 javascript: (() => {
-    if(!window.sessionStorage.getItem("t0")) {
+    if(window.location.href != window.sessionStorage.getItem("href") || !window.sessionStorage.getItem("t0")) {
         window.VideoSpeedPlugin = {t0: Date.now()};
+        window.sessionStorage.setItem(href, window.location.href);
         window.sessionStorage.setItem("t0", Date.now());
     } else {
         window.VideoSpeedPlugin = {...window.VideoSpeedPlugin, t0: parseInt(window.sessionStorage.getItem("t0"))};
